@@ -1,0 +1,27 @@
+# Example sprout.yml for a Next.js + Drizzle app (WerkUp-style).
+project: werkup
+
+app:
+  build:
+    context: .
+    dockerfile: Dockerfile
+  port: 3000
+  env_file: .env.preview        # BETTER_AUTH_SECRET, API keys, etc.
+  env:
+    NODE_ENV: production
+
+db:
+  engine: postgres:16-alpine
+  database: werkup
+  user: postgres
+  password: postgres
+  internal_host: db
+  url_var: DATABASE_URL
+  mirror_vars: [DATABASE_URL_UNPOOLED]   # app reads both; same value
+  snapshot:
+    source_env: PROD_DATABASE_URL        # export before `sprout snapshot`
+  migrate: "pnpm db:migrate"
+  seed: "pnpm db:seed"
+
+proxy:
+  domain: "{pr}.{project}.localhost"

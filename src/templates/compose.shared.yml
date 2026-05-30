@@ -1,0 +1,36 @@
+# sprout shared services — run once via `sprout shared up`.
+# Caddy reverse-proxies every per-PR app by reading docker labels.
+# Dozzle gives one web UI for the logs of all sprout-* containers.
+services:
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:2.9-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      CADDY_INGRESS_NETWORKS: sprout-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - caddy_data:/data
+    networks:
+      - sprout-net
+
+  dozzle:
+    image: amir20/dozzle:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      DOZZLE_FILTER: "name=sprout-"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - sprout-net
+
+volumes:
+  caddy_data:
+
+networks:
+  sprout-net:
+    external: true
+    name: sprout-net

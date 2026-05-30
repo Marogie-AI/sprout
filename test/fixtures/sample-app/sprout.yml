@@ -1,0 +1,13 @@
+project: sample
+app:
+  build:
+    context: .
+    dockerfile: Dockerfile
+  port: 3000
+  env:
+    NODE_ENV: production
+db:
+  database: appdb
+  snapshot:
+    source_env: PROD_DATABASE_URL
+  migrate: "node migrate.js"
